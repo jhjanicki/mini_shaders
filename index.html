@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Multiple mini shaders</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			* {
+				box-sizing: border-box;
+				-moz-box-sizing: border-box;
+			}
+
+			body {
+				color: #000;
+				font-family:Monospace;
+				font-size:13px;
+
+				background-color: #fff;
+				margin: 0px;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+				text-align:center;
+			}
+
+			#content {
+				position: absolute;
+				top: 0px; width: 100%;
+				z-index: 1;
+				padding: 3em 0 0 0;
+			}
+
+			a {
+				color: #0080ff;
+			}
+
+			#c {
+				position: fixed;
+				left: 0px;
+				width: 100%;
+				height: 100%;
+			}
+
+			.list-item {
+				display: inline-block;
+				margin: 1em;
+				padding: 1em;
+				box-shadow: 1px 2px 4px 0px rgba(0,0,0,0.25);
+			}
+
+			.list-item .scene {
+				width: 200px;
+				height: 200px;
+			}
+
+			.list-item .description {
+				color: #888;
+				font-family: sans-serif;
+				font-size: large;
+				width: 200px;
+				margin-top: 0.5em;
+			}
+		</style>
+	</head>
+
+<body>
+   <div id="container"></div>
+   <canvas id="c"></canvas>
+
+		<div id="content">
+			<div id="info">Multiple mini shaders</div>
+		</div>
+
+   <script id="vertexShader" type="x-shader/x-vertex">
+       void main() {
+           gl_Position = vec4( position, 1.0 );
+       }
+   </script>
+   <script id="fragmentShader0" type="x-shader/x-fragment">
+       uniform float width;
+       uniform float height;
+       uniform vec2 u_resolution;
+       uniform float u_time;
+       
+
+       void main() {
+           vec2 st = gl_FragCoord.xy/u_resolution.xy;
+           gl_FragColor=vec4(st.x,st.y,0.0,1.0);
+       }
+   </script>
+  <script id="fragmentShader1" type="x-shader/x-fragment">
+      uniform vec2 u_resolution;
+      uniform float u_time;
+
+      float plot(vec2 st, float pct){
+         return  smoothstep( pct-0.02, pct, st.y) -
+                 smoothstep( pct, pct+0.02, st.y);
+       }
+       
+       void main() {
+           vec2 st = gl_FragCoord.xy/u_resolution;
+       
+           float y = step(0.5,st.x);
+       
+           vec3 color = vec3(y);
+       
+           float pct = plot(st,y);
+           color = (1.0-pct)*color+pct*vec3(0.0,1.0,0.0);
+       
+           gl_FragColor = vec4(color,1.0);
+       }
+  </script>
+  <script id="fragmentShader2" type="x-shader/x-fragment">
+   uniform vec2 u_resolution;
+   uniform float u_time;
+
+   void main() {
+      vec2 st = gl_FragCoord.xy/u_resolution;
+      gl_FragColor = vec4(st.y,st.y*0.8,0.5,1.0);
+   }
+
+   </script>
+
+   <script id="template" type="notjs">
+      <div class="scene"></div>
+      <div class="description">Scene $</div>
+   </script>
+   
+   <script src="./three.min.js"></script>
+	<script src="./OrbitControls.js"></script>
+	<script src="./Detector.js"></script>
+   <script src="./main.js"></script>
+      
+</body>
+
+</html>
